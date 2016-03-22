@@ -7,7 +7,10 @@
 //
 
 #import "AppDelegate.h"
-
+#import "MainViewController.h"
+#import "MainTabBarViewController.h"
+#import "MandyFactory.h"
+#import "BasicViewController.h"
 @interface AppDelegate ()
 
 @end
@@ -17,8 +20,59 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    self.window = [MandyFactory createWindow];
+    
+    self.window.rootViewController = [self createTabBarController];
+    
+    [self.window makeKeyAndVisible];
+    
+    //    [UIApplication sharedApplication].statusBarStyle = [self preferredStatusBarStyle];
+    
     return YES;
 }
+- (MainTabBarViewController *)createTabBarController{
+    
+    NSArray * titleArray = @[@"客户",@"楼盘",@"动态",@"我的"];
+    
+    NSArray * normalImageArray = @[@"btn_column_normal",@"btn_live_normal",@"btn_home_normal",@"btn_user_normal"];
+    NSArray * selectedImageArray = @[@"btn_column_selected",@"btn_live_selected",@"btn_home_selected",@"btn_user_selected"];
+    NSArray * controllersArray = @[@"ConsumerMainViewController",@"BuildingsMainViewController",@"DynamicMainViewController",@"MineMainViewController"];
+    
+    NSMutableArray * arr = [NSMutableArray array];
+    
+    for (int i =  0 ; i< controllersArray.count; i ++) {
+        
+        UIViewController * vc = [MandyFactory createViewControllerWithName:controllersArray[i] andColor:i + 4];
+        
+        UINavigationController * nav  = [[UINavigationController alloc]initWithRootViewController:vc];
+        
+        //        nav.navigationBar.barStyle =
+        nav.navigationBar.translucent = NO;
+        
+        nav.navigationBar.barTintColor = [UIColor orangeColor];
+        
+        nav.tabBarItem = [[UITabBarItem alloc]initWithTitle:titleArray[i] image:[UIImage imageNamed: normalImageArray[i]] selectedImage:[UIImage imageNamed:selectedImageArray[i]]];
+        
+        [arr addObject:nav];
+        
+    }
+    
+    
+    MainTabBarViewController * tabBar = [[MainTabBarViewController alloc]init];
+    
+    tabBar.viewControllers = [arr copy];
+    
+    return tabBar;
+    
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
